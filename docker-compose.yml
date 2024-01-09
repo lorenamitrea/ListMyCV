@@ -1,0 +1,13 @@
+version: '3.8'
+services: 
+    api-service:
+        build: .
+        volumes: 
+            - ./webapp:/code/webapp
+        ports: 
+            - "8000:8000"
+        environment: 
+            PORT: 8000
+            FLASK_DEBUG: 1
+            EXAMPLE_JSON: "/code/webapp/main/data/exampleCV.json"
+            EXAMPLE_TXT: "/code/webapp/main/data/exampleCV.txt"
