@@ -25,7 +25,9 @@ def parse_cv(cv_path, field):
         with open(cv_path) as fd:
             if file_extension == '.json':
                 content = json.load(fd)
-                cv_content = content.get(field, '')
+                content = content.get(field, '')
+                if content:
+                    cv_content.extend(content if isinstance(content, list) else [content])
             else:
                 content = fd.read()
 
@@ -53,8 +55,7 @@ def parse_cv(cv_path, field):
 @click.argument('field')
 def get_details(field):
     result = parse_cv(cv_path=os.getenv('EXAMPLE_JSON'), field=field)
-    app.logger.info(result)
-    return result
+    click.echo(result)
 
 
 @app.route('/', methods=['GET'])

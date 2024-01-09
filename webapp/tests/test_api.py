@@ -1,13 +1,13 @@
 import json
 import os
-from webapp.main.app import parse_cv
+from webapp.main.app import parse_cv, get_details
 import pytest
 from unittest.mock import patch, Mock
 from io import StringIO
 
 
 @pytest.mark.parametrize('filename,expected', [
-    ('EXAMPLE_JSON', 'Rosie Miller\nPittsburgh, PA 15201\n(555) 555-5555\nexample@example.com'),
+    ('EXAMPLE_JSON', ['Rosie Miller\nPittsburgh, PA 15201\n(555) 555-5555\nexample@example.com']),
     ('EXAMPLE_TXT', ['Rosie Miller', 'Pittsburgh, PA 15201', '(555) 555-5555', 'example@example.com'])
 ])
 def test_parse_cv(filename, expected):
@@ -17,7 +17,7 @@ def test_parse_cv(filename, expected):
 
 def test_parse_cv_missing_field():
     expected = parse_cv(os.getenv('EXAMPLE_JSON'), 'empty')
-    assert expected == ''
+    assert expected == []
 
 
 def test_list_endpoints(client):
@@ -54,3 +54,12 @@ def test_mock_parse(mock_open):
     mock_open.return_value.__enter__.return_value = StringIO(FILE_CONTENT)
     result = parse_cv('/test/file', 'personal')
     assert result == ['Rosie Miller', 'Pittsburgh, PA 15201', '(555) 555-5555', 'example@example.com']
+
+
+def test_flask_cli(runner):
+    result = runner.invoke(
+        args=['get', 'personal'],
+    )
+    assert result.exit_code == 0
+    assert result.output == "['Rosie Miller\\nPittsburgh, PA 15201\\n(555) 555-5555\\nexample@example.com']\n"
+
